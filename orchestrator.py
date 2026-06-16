@@ -6,25 +6,34 @@ from evaluator import evaluate_answer
 LEVELS = ["easy", "medium", "hard"]
 
 def pick_topic(state):
-    # 1. Gather all active topic categories
     all_topics = list(state["weak_topics"].keys())
     
-    # 2. Check what areas the candidate is struggling with the most
-    max_weak_value = max(state["weak_topics"].values())
+    # 1. Get the topic that was just asked in the previous round
+    last_topic = state.get("current_topic")
     
-    # If there are actual weak points flagged (> 0), pick randomly among the weakest areas
+    # 2. Force variety: filter it out so we choose a different topic next turn
+    if last_topic in all_topics and len(all_topics) > 1:
+        available_topics = [t for t in all_topics if t != last_topic]
+    else:
+        available_topics = all_topics
+        
+    # 3. Look for weak spots ONLY among the newly filtered available topics
+    weak_counts = {t: state["weak_topics"].get(t, 0) for t in available_topics}
+    max_weak_value = max(weak_counts.values()) if weak_counts else 0
+    
     if max_weak_value > 0:
-        candidates = [topic for topic, count in state["weak_topics"].items() if count == max_weak_value]
+        candidates = [topic for topic, count in weak_counts.items() if count == max_weak_value]
         return random.choice(candidates)
         
-    # 3. If there are no mistakes yet, prioritize resume skills but shuffle them to ensure variety
+    # 4. If no clear weak areas exist, check for resume skills
     if state.get("resume_skills"):
-        valid_skills = [skill for skill in state["resume_skills"] if skill in state["weak_topics"]]
+        valid_skills = [skill for skill in state["resume_skills"] if skill in available_topics]
         if valid_skills:
-            return random.choice(valid_skills) # Shuffles choices instead of locking the first one
+            return random.choice(valid_skills)
             
-    # 4. Ultimate fallback: pick any category randomly
-    return random.choice(all_topics)
+    # 5. Fallback selection
+    return random.choice(available_topics)
+
 
 
 
@@ -60,18 +69,25 @@ def generate_followup(topic, result):
     return None
 
 def run_interview_turn(state, answer):
-    # Process the evaluation of the user's answer
+    # Process the evaluation of the user's current answer
     result = evaluate_answer(state["current_question"], answer)
     topic = state["current_topic"]
     
     update_memory(state, topic, result)
     update_difficulty(state, result["score"])
     
-    # Track follow-up state
-    followup = generate_followup(topic, result)
+    # 1. Check if the question just answered was ALREADY a follow-up
+    was_already_followup = state.get("pending_followup") is not None
+    
+    # 2. Only generate a new follow-up if we aren't already inside one
+    if not was_already_followup:
+        followup = generate_followup(topic, result)
+    else:
+        followup = None # Force transition to a new question
+        
     state["pending_followup"] = followup
     
-    # Stage the next question immediately
+    # 3. Stage the next question
     if followup:
         state["current_question"] = followup
     else:
