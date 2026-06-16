@@ -4,13 +4,27 @@ from state import state
 import random
 
 
+LEVELS = ["easy", "medium", "hard"]
+
+
 def pick_topic():
-    weak = sorted(state["weak_topics"].items(), key=lambda x: x[1], reverse=True)
 
+    weak = sorted(
+        state["weak_topics"].items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    # Focus on top weak topics
     if weak[0][1] > 0:
-        return weak[0][0]
 
-    return random.choice(list(state["weak_topics"].keys()))
+        top_topics = weak[:2]
+
+        return random.choice(top_topics)[0]
+
+    return random.choice(
+        list(state["weak_topics"].keys())
+    )
 
 
 def update_memory(topic, result):
@@ -23,42 +37,74 @@ def update_memory(topic, result):
 
 def update_difficulty(score):
 
-    if score >= 4:
-        state["difficulty"] = "hard" if state["difficulty"] == "medium" else "medium"
-    elif score <= 1:
-        state["difficulty"] = "easy" if state["difficulty"] == "medium" else "medium"
+    current = LEVELS.index(
+        state["difficulty"]
+    )
+
+    if score >= 4 and current < 2:
+        state["difficulty"] = LEVELS[current + 1]
+
+    elif score <= 1 and current > 0:
+        state["difficulty"] = LEVELS[current - 1]
 
 
-# 🔥 NEW: FOLLOW-UP LOGIC
 def generate_followup(topic, result):
 
-    if result["grade"] == "Weak":
-        return f"Can you explain {topic} more simply?"
+    if result["score"] <= 1:
+        return f"Can you explain {topic} more clearly?"
 
     if result["score"] >= 5:
-        return f"Good. Now give a real-world example of {topic}."
+        return f"Give a real-world example of {topic}."
 
     return None
 
 
 def run_interview(answer=None):
 
+    # ASK FOLLOWUP FIRST
+    if state["pending_followup"]:
+
+        followup_question = state["pending_followup"]
+
+        state["pending_followup"] = None
+
+        if answer is None:
+            return followup_question, "followup"
+
     topic = pick_topic()
-    question = get_question(topic, state["difficulty"])
+
+    question = get_question(
+        topic,
+        state["difficulty"]
+    )
 
     if answer is None:
         return question, topic
 
-    result = evaluate_answer(question, answer)
+    result = evaluate_answer(
+        question,
+        answer
+    )
 
     update_memory(topic, result)
-    update_difficulty(result["score"])
 
-    followup = generate_followup(topic, result)
+    update_difficulty(
+        result["score"]
+    )
+
+    followup = generate_followup(
+        topic,
+        result
+    )
+
+    state["pending_followup"] = followup
 
     return {
         "question": question,
+        "topic": topic,
         "result": result,
         "followup": followup,
-        "difficulty": state["difficulty"]
+        "difficulty": state["difficulty"],
+        "weak_topics": state["weak_topics"],
+        "strong_topics": state["strong_topics"]
     }

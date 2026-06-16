@@ -15,5 +15,7 @@ state = {
         "oop": 0
     },
 
+    "pending_followup": None,
+
     "resume_skills": []
 }

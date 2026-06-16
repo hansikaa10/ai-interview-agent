@@ -21,5 +21,6 @@ def extract_resume_skills(file_path):
     for k in keywords:
         if k in text.lower():
             skills.append(k)
-
+            
     return skills if skills else ["No skills detected"]
+

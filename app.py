@@ -33,21 +33,22 @@ if st.button("Submit Answer"):
     output = run_interview(answer)
 
     result = output["result"]
-    topic = output["question"]
     difficulty = output["difficulty"]
     followup = output["followup"]
+    topic = output["topic"]
 
     st.write("### 📊 Score:", result["score"])
     st.write("### 🧠 Grade:", result["grade"])
+
     if followup:
-        st.write("### 🔁 Follow-up:", followup)
+        st.write("### 🔁 Follow-up")
+        st.write(followup)
 
-    st.write("### 💬 Feedback:")
-    for f in result["feedback"]:
-        st.write("-", f)
+    st.write("### 🎯 Current Topic")
+    st.write(topic)
 
-    st.write("### 📌 Topic:", topic)
-    st.write("### 🎚 Difficulty:", difficulty)
+    st.write("### ⚡ Difficulty")
+    st.write(difficulty)
 
     q, topic = run_interview()
     st.session_state.question = q
