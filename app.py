@@ -7,6 +7,7 @@ from orchestrator import run_interview_turn, pick_topic
 from questions import get_question
 from resume_parser import extract_resume_skills
 from feedback import generate_feedback
+from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
 
@@ -23,9 +24,12 @@ if state["current_question"] is None:
     state["current_question"] = get_question(first_topic, state["difficulty"])
 
 # 2. Sidebar Componentry
-st.sidebar.title("🧠 Candidate Assessment Context")
+# Locate your sidebar section in app.py and update it to this:
 
-# Resume Skill Processor
+# 2. Sidebar Componentry
+st.sidebar.title("🧠 Assessment Metrics")
+
+# Resume Skill Processor (Keep your existing upload code intact)
 uploaded_file = st.sidebar.file_uploader("Upload PDF Resume", type=["pdf"])
 if uploaded_file and not state["resume_loaded"]:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -34,6 +38,48 @@ if uploaded_file and not state["resume_loaded"]:
         state["resume_skills"] = skills
         state["resume_loaded"] = True
         st.sidebar.success(f"Loaded Skills: {', '.join(skills)}")
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("🎯 Live Calibration Metrics")
+
+# Visual Element 1: Clean Level Indicator Gauge
+difficulty_colors = {"easy": "🟢 Easy Track", "medium": "🟡 Medium Track", "hard": "🔴 Hard Track"}
+current_lev = state.get('difficulty', 'easy')
+st.sidebar.markdown(f"Current Difficulty Level: **{difficulty_colors.get(current_lev, current_lev.upper())}**")
+
+# Visual Element 2: Real-time Interactive Strength vs. Weakness Chart
+st.sidebar.markdown("##### **Topic Competency Matrix**")
+
+# Prepare data payload safely for the UI rendering framework
+chart_data = {}
+all_topics = set(list(state["strong_topics"].keys()) + list(state["weak_topics"].keys()))
+
+for topic in all_topics:
+    strong_count = state["strong_topics"].get(topic, 0)
+    weak_count = state["weak_topics"].get(topic, 0)
+    # Calculate a net baseline proficiency metric index score
+    total_attempts = strong_count + weak_count
+    if total_attempts > 0:
+        chart_data[topic.upper()] = round((strong_count / total_attempts) * 100, 1)
+    else:
+        chart_data[topic.upper()] = 0.0
+
+# Render native graphical container instantly down the sidebar channel
+if any(v > 0 for v in chart_data.values()):
+    st.sidebar.bar_chart(chart_data)
+else:
+    st.sidebar.caption("Complete your first interview question to populate the analytics dashboard chart grid matrix.")
+
+# Visual Element 3: Clean Metric Progress Cards
+st.sidebar.markdown("##### **Recent Score Trajectory Trend**")
+if state.get("score_history"):
+    recent_scores = state["score_history"][-3:] # Capture the last 3 turns
+    cols = st.sidebar.columns(len(recent_scores))
+    for idx, scr in enumerate(recent_scores):
+        cols[idx].metric(label=f"Round {len(state['score_history'])-len(recent_scores)+idx+1}", value=f"{scr}/5")
+else:
+    st.sidebar.caption("No historical run timelines recorded yet.")
+
 
 # Metrics Dashboard
 st.sidebar.markdown("---")
@@ -83,26 +129,21 @@ if "last_feedback" in st.session_state:
     st.markdown(st.session_state["last_feedback"])
 
 # 4. Final Transcript Report Generator Engine
+
 if len(state["history"]) > 0:
     st.markdown("---")
     st.subheader("🏁 Conclude & Export Interview")
     
-    if st.button("Generate Performance Transcript"):
-        report_data = {
-            "candidate_skills": state["resume_skills"],
-            "final_standing": {
-                "difficulty_achieved": state["difficulty"],
-                "strong_areas": state["strong_topics"],
-                "weak_areas": state["weak_topics"]
-            },
-            "detailed_timeline": state["history"]
-        }
+    try:
+        # Generate the PDF binary array snapshot string data stream 
+        pdf_data = generate_pdf_transcript(state)
         
-        json_report = json.dumps(report_data, indent=4)
-        st.success("Report successfully generated!")
+        st.success("PDF Transcript successfully compiled and calibrated!")
         st.download_button(
-            label="📥 Download JSON Assessment Report",
-            data=json_report,
-            file_name="interview_performance_report.json",
-            mime="application/json"
+            label="📥 Download PDF Assessment Report",
+            data=bytes(pdf_data), # Convert string output buffer safely into browser byte format
+            file_name="interview_performance_report.pdf",
+            mime="application/pdf"
         )
+    except Exception as e:
+        st.error(f"Failed to generate document matrix layout: {str(e)}")

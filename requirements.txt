@@ -1,2 +1,4 @@
+# requirements.txt
 streamlit
 pdfminer.six
+fpdf2
