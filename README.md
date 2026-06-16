@@ -56,11 +56,12 @@ This project is an AI-powered interview simulator that adapts questions based on
 ## Project Structure
 
 - app.py → Streamlit UI  
-- orchestrator.py → Interview logic  
+- orchestrator.py → Interview flow logic  
 - evaluator.py → Scoring engine  
 - questions.py → Question bank  
-- state.py → Memory storage  
+- state.py → Memory tracking system  
 - resume_parser.py → Resume skill extraction  
+- feedback.py → Feedback formatting helper   
 
 ---
 
