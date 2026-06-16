@@ -61,43 +61,48 @@ def generate_followup(topic, result):
 
 def run_interview(answer=None):
 
-    # ASK FOLLOWUP FIRST
-    if state["pending_followup"]:
-
+    if state["pending_followup"] and answer is None:
         followup_question = state["pending_followup"]
-
         state["pending_followup"] = None
-
-        if answer is None:
-            return followup_question, "followup"
+        return {
+            "question": followup_question,
+            "topic": "followup",
+            "result": None,
+            "followup": None,
+            "difficulty": state["difficulty"],
+            "weak_topics": state["weak_topics"],
+            "strong_topics": state["strong_topics"]
+        }
 
     topic = pick_topic()
 
-    question = get_question(
-        topic,
-        state["difficulty"]
-    )
+    question = get_question(topic, state["difficulty"])
 
     if answer is None:
-        return question, topic
+        return {
+            "question": question,
+            "topic": topic,
+            "difficulty": state["difficulty"]
+        }
 
-    result = evaluate_answer(
-        question,
-        answer
-    )
+    result = evaluate_answer(question, answer)
 
     update_memory(topic, result)
+    update_difficulty(result["score"])
 
-    update_difficulty(
-        result["score"]
-    )
-
-    followup = generate_followup(
-        topic,
-        result
-    )
+    followup = generate_followup(topic, result)
 
     state["pending_followup"] = followup
+
+    # 🔥 NEW: history tracking
+    state["history"].append({
+        "question": question,
+        "answer": answer,
+        "topic": topic,
+        "score": result["score"]
+    })
+
+    state["score_history"].append(result["score"])
 
     return {
         "question": question,
