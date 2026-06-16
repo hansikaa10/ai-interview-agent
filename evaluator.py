@@ -1,64 +1,123 @@
+import re
+
+# 🧠 Concept-based answer evaluation (SMART upgrade)
+
+CONCEPTS = {
+    "functions": [
+        "reusable",
+        "reuse",
+        "call",
+        "parameters",
+        "arguments",
+        "return",
+        "code block",
+        "specific task"
+    ],
+    "loops": [
+        "iteration",
+        "repeat",
+        "for",
+        "while",
+        "condition",
+        "sequence",
+        "multiple times"
+    ],
+    "oop": [
+        "class",
+        "object",
+        "inheritance",
+        "polymorphism",
+        "encapsulation",
+        "method"
+    ],
+    "basics": [
+        "variable",
+        "data type",
+        "store",
+        "value",
+        "memory"
+    ]
+}
+
+
 def evaluate_answer(question, answer):
-    answer = answer.strip().lower()
-    question = question.lower()
+
+    answer = answer.lower().strip()
 
     score = 0
     feedback = []
 
+    # --- 1. Length check (still useful) ---
     word_count = len(answer.split())
 
-    # 1. Length intelligence
     if word_count < 5:
         score -= 2
-        feedback.append("Too short — interviewer expects explanation.")
+        feedback.append("Answer is too short.")
     elif word_count > 25:
         score += 2
-        feedback.append("Good depth of explanation.")
+        feedback.append("Good detailed explanation.")
     else:
         score += 1
+        feedback.append("Decent length.")
 
-    # 2. Confidence detection
-    low_confidence = ["idk", "not sure", "maybe", "i think"]
-    if any(w in answer for w in low_confidence):
-        score -= 2
-        feedback.append("Low confidence in answer.")
+    # --- 2. Detect topic ---
+    question_lower = question.lower()
 
-    # 3. Reasoning signals
-    reasoning_words = ["because", "therefore", "for example", "means", "so"]
-    if any(w in answer for w in reasoning_words):
-        score += 2
-        feedback.append("Good reasoning shown.")
+    topic_found = "basics"
+    for t in CONCEPTS.keys():
+        if t in question_lower:
+            topic_found = t
+            break
 
-    # 4. Topic alignment check
-    topic_map = {
-        "loop": ["for", "while", "iteration"],
-        "function": ["return", "def", "parameter"],
-        "oop": ["class", "object", "inheritance"]
-    }
+    # --- 3. Concept matching ---
+    matched = 0
+    expected = CONCEPTS[topic_found]
 
-    matched = None
+    for concept in expected:
+        if re.search(r"\b" + re.escape(concept) + r"\b", answer):
+            matched += 1
 
-    for t, keywords in topic_map.items():
-        if t in question:
-            matched = t
-            if any(k in answer for k in keywords):
-                score += 2
-                feedback.append(f"Correct concept coverage: {t}")
-            else:
-                score -= 2
-                feedback.append(f"Missing core concept of {t}")
+    concept_score = (matched / len(expected)) * 5
 
-    # 5. Final grade
-    if score >= 5:
-        grade = "Strong"
+    score += concept_score
+
+    feedback.append(
+        f"Matched {matched}/{len(expected)} key concepts for {topic_found}."
+    )
+
+    # --- 4. Weak answer detection ---
+    weak_phrases = ["idk", "i don't know", "no idea", "not sure"]
+
+    if any(p in answer for p in weak_phrases):
+        score -= 3
+        feedback.append("Shows lack of clarity.")
+
+    # --- 5. Final grading ---
+    if score >= 6:
+        grade = "Excellent"
+    elif score >= 4:
+        grade = "Good"
     elif score >= 2:
         grade = "Average"
     else:
         grade = "Weak"
 
     return {
-        "score": score,
+        "score": round(score, 2),
         "grade": grade,
         "feedback": feedback,
-        "matched_topic": matched
+        "matched_topic": topic_found
     }
+
+
+# 🧾 Pretty formatter (optional use in Streamlit)
+def format_feedback(result):
+
+    return f"""
+📊 Evaluation Result
+--------------------
+Score: {result['score']}
+Grade: {result['grade']}
+
+🧠 Feedback:
+- """ + "\n- ".join(result["feedback"])
