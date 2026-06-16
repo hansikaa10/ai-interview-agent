@@ -29,11 +29,10 @@ if "question" not in st.session_state:
     output = run_interview()
 
     st.session_state.question = output["question"]
-    st.session_state.topic = output.get("topic", "basics")
-    st.session_state.difficulty = output.get("difficulty", "easy")
+    st.session_state.topic = output["topic"]
 
 # -----------------------------
-# Display question
+# Display question (ONLY source of truth)
 # -----------------------------
 st.write("### 🧠 Question:")
 st.write(st.session_state.question)
@@ -48,9 +47,7 @@ if st.button("Submit Answer"):
     output = run_interview(answer)
 
     result = output["result"]
-    difficulty = output["difficulty"]
     followup = output["followup"]
-    topic = output["topic"]
 
     st.write("### 📊 Score:", result["score"])
     st.write("### 🧠 Grade:", result["grade"])
@@ -60,22 +57,15 @@ if st.button("Submit Answer"):
         for f in result["feedback"]:
             st.write("- ", f)
 
+    
     if followup:
-        st.write("### 🔁 Follow-up Question")
-        st.write(followup)
-
-    st.write("### 🎯 Topic")
-    st.write(topic)
-
-    st.write("### ⚡ Difficulty")
-    st.write(difficulty)
-
-    # get next question in SAME response cycle
-    next_output = run_interview()
-
-    st.session_state.question = next_output["question"]
-    st.session_state.topic = next_output["topic"]
-    st.session_state.difficulty = next_output["difficulty"]
+        st.session_state.question = followup
+        st.session_state.topic = "followup"
+    else:
+    
+        next_q = run_interview()
+        st.session_state.question = next_q["question"]
+        st.session_state.topic = next_q["topic"]
 
 # -----------------------------
 # 📊 Sidebar Analytics
