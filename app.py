@@ -70,10 +70,12 @@ if st.button("Submit Answer"):
     st.write("### ⚡ Difficulty")
     st.write(difficulty)
 
-    # update UI question
-    new_q = run_interview()
-    st.session_state.question = new_q["question"]
-    st.session_state.topic = new_q["topic"]
+    # get next question in SAME response cycle
+    next_output = run_interview()
+
+    st.session_state.question = next_output["question"]
+    st.session_state.topic = next_output["topic"]
+    st.session_state.difficulty = next_output["difficulty"]
 
 # -----------------------------
 # 📊 Sidebar Analytics

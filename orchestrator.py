@@ -77,24 +77,22 @@ def generate_followup(topic, result):
 
 def run_interview(answer=None):
 
+    # 🔁 HANDLE FOLLOW-UP FIRST
     if state["pending_followup"] and answer is None:
         followup_question = state["pending_followup"]
         state["pending_followup"] = None
+
         return {
             "question": followup_question,
             "topic": "followup",
-            "result": None,
-            "followup": None,
-            "difficulty": state["difficulty"],
-            "weak_topics": state["weak_topics"],
-            "strong_topics": state["strong_topics"]
+            "difficulty": state["difficulty"]
         }
 
-    topic = pick_topic()
-
-    question = get_question(topic, state["difficulty"])
 
     if answer is None:
+        topic = pick_topic()
+        question = get_question(topic, state["difficulty"])
+
         return {
             "question": question,
             "topic": topic,
