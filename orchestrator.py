@@ -74,10 +74,11 @@ def generate_followup(topic, result):
 
     return None
 
-
 def run_interview(answer=None):
 
-    # 🔁 HANDLE FOLLOW-UP FIRST
+    # -------------------------
+    # 1. FOLLOW-UP HANDLING
+    # -------------------------
     if state["pending_followup"] and answer is None:
         followup_question = state["pending_followup"]
         state["pending_followup"] = None
@@ -88,17 +89,25 @@ def run_interview(answer=None):
             "difficulty": state["difficulty"]
         }
 
+    # -------------------------
+    # 2. GENERATE QUESTION SAFELY
+    # -------------------------
+    topic = pick_topic()
+    question = get_question(topic, state["difficulty"])
 
+    # -------------------------
+    # 3. IF ASKING QUESTION ONLY
+    # -------------------------
     if answer is None:
-        topic = pick_topic()
-        question = get_question(topic, state["difficulty"])
-
         return {
             "question": question,
             "topic": topic,
             "difficulty": state["difficulty"]
         }
 
+    # -------------------------
+    # 4. EVALUATE ANSWER (SAFE NOW)
+    # -------------------------
     result = evaluate_answer(question, answer)
 
     update_memory(topic, result)
@@ -108,7 +117,6 @@ def run_interview(answer=None):
 
     state["pending_followup"] = followup
 
-    # 🔥 NEW: history tracking
     state["history"].append({
         "question": question,
         "answer": answer,
@@ -116,14 +124,10 @@ def run_interview(answer=None):
         "score": result["score"]
     })
 
-    state["score_history"].append(result["score"])
-
     return {
         "question": question,
         "topic": topic,
         "result": result,
         "followup": followup,
-        "difficulty": state["difficulty"],
-        "weak_topics": state["weak_topics"],
-        "strong_topics": state["strong_topics"]
+        "difficulty": state["difficulty"]
     }
