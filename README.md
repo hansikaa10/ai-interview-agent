@@ -1,86 +1,82 @@
-# AI Adaptive Interview Agent
+# 🧠 Adaptive AI Interview Agent
 
-This project is an AI-powered interview simulator that adapts questions based on user performance and resume skills. It evaluates answers, tracks progress across topics, and adjusts difficulty dynamically.
+Welcome! This is a dynamic, state-preserving technical interview simulator built with Python and Streamlit. The application evaluates a candidate's conceptual understanding of programming topics in real-time, shifts questioning difficulty based on performance trends, extracts tech skills directly from uploaded PDF resumes, and exports a polished, presentation-ready PDF report of the session.
 
----
-
-## What this project does
-
-- Questions are selected based on topic and difficulty  
-- Answers are evaluated using a rule-based scoring system  
-- Difficulty adjusts automatically based on performance  
-- Weak and strong topics are tracked  
-- Follow-up questions are generated when needed  
-- Resume skills influence question selection  
+I built this project to dive deep into **state machine design**, **data extraction pipelines**, and **real-time analytical dashboards**.
 
 ---
 
-## Key Features
+## 🚀 Key Architectural Highlights
 
-- Adaptive question selection  
-- Dynamic difficulty progression (easy, medium, hard)  
-- Topic-wise performance tracking  
-- Resume-based skill extraction  
-- Structured feedback system  
-- Follow-up question generation  
-- Session memory support  
+*   **Atomic State Management:** Streamlit naturally executes code from top to bottom on every single button press, which normally wipes out active variables. I engineered a centralized memory engine inside `st.session_state` to prevent data erasure and keep the interview flowing flawlessly.
+*   **Dynamic Calibration Loops:** Designed an algorithmic turn processor that automatically scales question tracks (`easy` ⇄ `medium` ⇄ `hard`) depending on conceptual competency scores.
+*   **Tokenized Skill Extraction:** Built a pipeline that extracts text from raw PDF resumes using structured token patterns to automatically prioritize interview questions that align with the candidate's actual tech stack.
+*   **Native Programmatic Reporting:** Replaced raw JSON console dumps with an automated document generation engine that compiles and balances a multi-page business layout down to the exact millimeter on an A4 canvas.
 
 ---
 
-## Tech Stack
+## 🏗️ Inside the Repository
 
-- Python  
-- Streamlit  
-- pdfminer  
-- Rule-based logic system  
-
----
-
-## How it works
-
-1. User starts interview  
-2. System selects question based on:
-   - difficulty  
-   - weak topics  
-   - resume skills  
-3. User submits answer  
-4. Answer is evaluated  
-5. System updates:
-   - score  
-   - difficulty  
-   - topic strengths/weaknesses  
-6. Next question is generated  
+```text
+ai-interview-agent/
+│
+├── app.py                # Core application dashboard and layout controller
+├── orchestrator.py       # Turn processor, scoring routing, and flow engine
+├── evaluator.py          # Structural evaluation rules and algorithm modules
+├── feedback.py           # Markdown styling and text analytics engine
+├── questions.py          # Categorized, multi-tiered mock technical repository
+├── state.py              # Central template schema for session initialization
+├── resume_parser.py      # High-level PDF data extraction and skill filter
+├── report_generator.py   # Byte-level PDF matrix compiler
+├── requirements.txt      # Python library dependencies
+└── .gitignore            # Version control exceptions file
+```
 
 ---
 
-## Project Structure
+## 📊 Live Performance Tracking & Visualization
 
-- app.py → Streamlit UI  
-- orchestrator.py → Interview flow logic  
-- evaluator.py → Scoring engine  
-- questions.py → Question bank  
-- state.py → Memory tracking system  
-- resume_parser.py → Resume skill extraction  
-- feedback.py → Giving feedback
+Instead of printing messy text blocks, the application computes metrics live in the sidebar dashboard:
+*   **Dynamic Bar Charts:** Renders a real-time responsive proficiency matrix using native Streamlit data containers.
+*   **Score Trajectories:** Tracks rolling micro-metric index cards monitoring performance trends over the last three consecutive rounds.
+*   **Targeted Reinforcement Loops:** Intentionally intercepts weak concepts, holding the candidate on an active focus topic to provide targeted follow-ups until core criteria are met.
 
 ---
 
-## Limitations
+## 🛠️ Local Setup & Installation Guide
 
-- Keyword-based evaluation  
-- Not fully semantic AI  
-- Basic resume parsing  
+### Prerequisites
+*   Make sure you have **Python 3.10 or higher** installed on your system.
 
----
+### 1. Clone the Project
+```bash
+git clone https://github.com
+cd ai-interview-agent
+```
 
-## Running locally
+### 2. Isolate with a Virtual Environment
+```bash
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
 
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
-streamlit run app.py 
 ```
+
+### 4. Run the Streamlit Instance
+```bash
+streamlit run app.py
+```
+
 ---
-## Author
 
-Hansika Poddar
-
+## 🏁 Exporting Final Assessment Metrics
+At the end of an active interview session, candidates can instantly compile and download a clean, corporate-ready A4 PDF document containing:
+1.  Identified skill proficiencies matched against uploaded resume metrics.
+2.  A calculated conceptual matrix of demonstrated strengths and weaknesses.
+3.  A complete, round-by-round historical transcript containing posed questions, candidate text inputs, and evaluation notes.
