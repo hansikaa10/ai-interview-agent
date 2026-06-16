@@ -1,36 +1,13 @@
+import random
 from questions import get_question
 from evaluator import evaluate_answer
 from state import state
-import random
-
 
 LEVELS = ["easy", "medium", "hard"]
-
-SKILL_TOPIC_MAP = {
-    "python": "basics",
-    "oop": "oop",
-    "loops": "loops",
-    "function": "functions",
-    "flask": "functions",
-    "django": "functions",
-}
 
 
 def pick_topic():
 
-    skills = state.get("resume_skills", [])
-
-    mapped_topics = []
-
-    for skill in skills:
-        if skill in SKILL_TOPIC_MAP:
-            mapped_topics.append(SKILL_TOPIC_MAP[skill])
-
-    # If resume has skills → prioritize them
-    if mapped_topics:
-        return random.choice(mapped_topics)
-
-    # fallback → weak topics
     weak = sorted(
         state["weak_topics"].items(),
         key=lambda x: x[1],
@@ -38,12 +15,20 @@ def pick_topic():
     )
 
     if weak and weak[0][1] > 0:
-        return random.choice(weak[:2])[0]
+        return weak[0][0]
 
     return random.choice(list(state["weak_topics"].keys()))
 
 
 def update_memory(topic, result):
+
+    state["score_history"].append(result["score"])
+    state["history"].append({
+        "topic": topic,
+        "question": state["current_question"],
+        "score": result["score"],
+        "grade": result["grade"]
+    })
 
     if result["score"] >= 3:
         state["strong_topics"][topic] += 1
@@ -53,9 +38,7 @@ def update_memory(topic, result):
 
 def update_difficulty(score):
 
-    current = LEVELS.index(
-        state["difficulty"]
-    )
+    current = LEVELS.index(state["difficulty"])
 
     if score >= 4 and current < 2:
         state["difficulty"] = LEVELS[current + 1]
@@ -74,40 +57,37 @@ def generate_followup(topic, result):
 
     return None
 
+
+# =========================
+# MAIN ENGINE (FIXED)
+# =========================
 def run_interview(answer=None):
 
     # -------------------------
-    # 1. FOLLOW-UP HANDLING
-    # -------------------------
-    if state["pending_followup"] and answer is None:
-        followup_question = state["pending_followup"]
-        state["pending_followup"] = None
-
-        return {
-            "question": followup_question,
-            "topic": "followup",
-            "difficulty": state["difficulty"]
-        }
-
-    # -------------------------
-    # 2. GENERATE QUESTION SAFELY
-    # -------------------------
-    topic = pick_topic()
-    question = get_question(topic, state["difficulty"])
-
-    # -------------------------
-    # 3. IF ASKING QUESTION ONLY
+    # ASK MODE
     # -------------------------
     if answer is None:
+
+        topic = pick_topic()
+        question = get_question(topic, state["difficulty"])
+
+        state["current_question"] = question
+        state["current_topic"] = topic
+
         return {
             "question": question,
             "topic": topic,
+            "result": None,
+            "followup": None,
             "difficulty": state["difficulty"]
         }
 
     # -------------------------
-    # 4. EVALUATE ANSWER (SAFE NOW)
+    # EVALUATION MODE
     # -------------------------
+    question = state["current_question"]
+    topic = state["current_topic"]
+
     result = evaluate_answer(question, answer)
 
     update_memory(topic, result)
@@ -115,14 +95,16 @@ def run_interview(answer=None):
 
     followup = generate_followup(topic, result)
 
-    state["pending_followup"] = followup
+    # IMPORTANT: next question becomes follow-up if exists
+    if followup:
+        state["current_question"] = followup
+        state["current_topic"] = topic
+    else:
+        new_topic = pick_topic()
+        new_q = get_question(new_topic, state["difficulty"])
 
-    state["history"].append({
-        "question": question,
-        "answer": answer,
-        "topic": topic,
-        "score": result["score"]
-    })
+        state["current_question"] = new_q
+        state["current_topic"] = new_topic
 
     return {
         "question": question,
