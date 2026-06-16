@@ -6,7 +6,7 @@ from state import state
 from resume_parser import extract_resume_skills
 
 # -----------------------------
-# CONFIG
+# PAGE CONFIG
 # -----------------------------
 st.set_page_config(page_title="AI Interview Agent", layout="centered")
 
@@ -27,17 +27,16 @@ if file:
         st.sidebar.success(f"Skills detected: {skills}")
 
 # -----------------------------
-# INIT QUESTION (ONLY ONCE)
+# INIT FIRST QUESTION
 # -----------------------------
 if "question" not in st.session_state:
-
     output = run_interview()
 
     st.session_state.question = output["question"]
     st.session_state.topic = output["topic"]
 
 # -----------------------------
-# DISPLAY QUESTION
+# DISPLAY CURRENT QUESTION
 # -----------------------------
 st.write("### 🧠 Question:")
 st.write(st.session_state.question)
@@ -45,12 +44,12 @@ st.write(st.session_state.question)
 answer = st.text_area("Your Answer:")
 
 # -----------------------------
-# SUBMIT ANSWER
+# SUBMIT ANSWER FLOW
 # -----------------------------
 if st.button("Submit Answer"):
 
     if not answer.strip():
-        st.warning("Please enter an answer before submitting.")
+        st.warning("Please write an answer before submitting.")
         st.stop()
 
     output = run_interview(answer)
@@ -58,31 +57,29 @@ if st.button("Submit Answer"):
     result = output["result"]
     followup = output["followup"]
 
-    # ALWAYS update question from backend
-    st.session_state.question = output["question"]
-    st.session_state.topic = output["topic"]
-
     # -------------------------
-    # SCORE OUTPUT
+    # SHOW RESULTS
     # -------------------------
     st.write("### 📊 Score:", result["score"])
     st.write("### 🧠 Grade:", result["grade"])
 
-    # -------------------------
-    # FEEDBACK
-    # -------------------------
     if result.get("feedback"):
         st.write("### 💡 Feedback")
         for f in result["feedback"]:
             st.write("- ", f)
 
     # -------------------------
-    # FOLLOW-UP LOGIC
+    # IMPORTANT: SINGLE QUESTION FLOW
     # -------------------------
     if followup:
-        st.info("Follow-up question generated")
-        st.write("### 🔁 Follow-up Question")
-        st.write(followup)
+        # Follow-up replaces current question
+        st.session_state.question = followup
+        st.session_state.topic = "followup"
+    else:
+        # Move to next normal question
+        new_q = run_interview()
+        st.session_state.question = new_q["question"]
+        st.session_state.topic = new_q["topic"]
 
 # -----------------------------
 # SIDEBAR ANALYTICS
