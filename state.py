@@ -16,7 +16,7 @@ state = {
     },
 
     "pending_followup": None,
-
+    "resume_skills": [],
     "history": [],
     "score_history": []
 }

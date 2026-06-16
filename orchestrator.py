@@ -6,25 +6,41 @@ import random
 
 LEVELS = ["easy", "medium", "hard"]
 
+SKILL_TOPIC_MAP = {
+    "python": "basics",
+    "oop": "oop",
+    "loops": "loops",
+    "function": "functions",
+    "flask": "functions",
+    "django": "functions",
+}
+
 
 def pick_topic():
 
+    skills = state.get("resume_skills", [])
+
+    mapped_topics = []
+
+    for skill in skills:
+        if skill in SKILL_TOPIC_MAP:
+            mapped_topics.append(SKILL_TOPIC_MAP[skill])
+
+    # If resume has skills → prioritize them
+    if mapped_topics:
+        return random.choice(mapped_topics)
+
+    # fallback → weak topics
     weak = sorted(
         state["weak_topics"].items(),
         key=lambda x: x[1],
         reverse=True
     )
 
-    # Focus on top weak topics
-    if weak[0][1] > 0:
+    if weak and weak[0][1] > 0:
+        return random.choice(weak[:2])[0]
 
-        top_topics = weak[:2]
-
-        return random.choice(top_topics)[0]
-
-    return random.choice(
-        list(state["weak_topics"].keys())
-    )
+    return random.choice(list(state["weak_topics"].keys()))
 
 
 def update_memory(topic, result):
