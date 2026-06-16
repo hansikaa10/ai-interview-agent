@@ -76,9 +76,10 @@ This project is an AI-powered interview simulator that adapts questions based on
 
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
-
+streamlit run app.py 
+```
 ---
 ## Author
 
 Hansika Poddar
+
