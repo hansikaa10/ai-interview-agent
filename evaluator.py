@@ -1,41 +1,19 @@
 import re
 
-# 🧠 Concept-based answer evaluation (SMART upgrade)
-
 CONCEPTS = {
     "functions": [
-        "reusable",
-        "reuse",
-        "call",
-        "parameters",
-        "arguments",
-        "return",
-        "code block",
-        "specific task"
+        "reuse", "reusable", "call", "return", "parameter",
+        "argument", "task", "specific"
     ],
     "loops": [
-        "iteration",
-        "repeat",
-        "for",
-        "while",
-        "condition",
-        "sequence",
-        "multiple times"
+        "iterate", "repeat", "for", "while", "multiple", "times"
     ],
     "oop": [
-        "class",
-        "object",
-        "inheritance",
-        "polymorphism",
-        "encapsulation",
-        "method"
+        "class", "object", "instance", "state",
+        "behavior", "attribute", "method", "encapsulation"
     ],
     "basics": [
-        "variable",
-        "data type",
-        "store",
-        "value",
-        "memory"
+        "variable", "data", "value", "store", "type"
     ]
 }
 
@@ -47,57 +25,53 @@ def evaluate_answer(question, answer):
     score = 0
     feedback = []
 
-    # --- 1. Length check (still useful) ---
-    word_count = len(answer.split())
+    # -----------------------
+    # LENGTH CHECK
+    # -----------------------
+    words = len(answer.split())
 
-    if word_count < 5:
-        score -= 2
+    if words < 5:
+        score -= 1
         feedback.append("Answer is too short.")
-    elif word_count > 25:
-        score += 2
-        feedback.append("Good detailed explanation.")
-    else:
+    elif words > 15:
         score += 1
-        feedback.append("Decent length.")
+        feedback.append("Good explanation length.")
 
-    # --- 2. Detect topic ---
-    question_lower = question.lower()
+    # -----------------------
+    # DETECT TOPIC
+    # -----------------------
+    topic = "basics"
+    q = question.lower()
 
-    topic_found = "basics"
-    for t in CONCEPTS.keys():
-        if t in question_lower:
-            topic_found = t
+    for t in CONCEPTS:
+        if t in q:
+            topic = t
             break
 
-    # --- 3. Concept matching ---
+    # -----------------------
+    # CONCEPT MATCHING (FAIR SCORING)
+    # -----------------------
     matched = 0
-    expected = CONCEPTS[topic_found]
-
-    for concept in expected:
-        if re.search(r"\b" + re.escape(concept) + r"\b", answer):
+    for concept in CONCEPTS[topic]:
+        if concept in answer:
             matched += 1
 
-    concept_score = (matched / len(expected)) * 5
-
+    # normalize score (IMPORTANT FIX)
+    concept_score = (matched / len(CONCEPTS[topic])) * 5
     score += concept_score
 
     feedback.append(
-        f"Matched {matched}/{len(expected)} key concepts for {topic_found}."
+        f"Matched {matched}/{len(CONCEPTS[topic])} key concepts for {topic}."
     )
 
-    # --- 4. Weak answer detection ---
-    weak_phrases = ["idk", "i don't know", "no idea", "not sure"]
-
-    if any(p in answer for p in weak_phrases):
-        score -= 3
-        feedback.append("Shows lack of clarity.")
-
-    # --- 5. Final grading ---
-    if score >= 6:
+    # -----------------------
+    # FINAL GRADING
+    # -----------------------
+    if score >= 4.5:
         grade = "Excellent"
-    elif score >= 4:
+    elif score >= 3:
         grade = "Good"
-    elif score >= 2:
+    elif score >= 1.5:
         grade = "Average"
     else:
         grade = "Weak"
@@ -106,18 +80,5 @@ def evaluate_answer(question, answer):
         "score": round(score, 2),
         "grade": grade,
         "feedback": feedback,
-        "matched_topic": topic_found
+        "matched_topic": topic
     }
-
-
-# 🧾 Pretty formatter (optional use in Streamlit)
-def format_feedback(result):
-
-    return f"""
-📊 Evaluation Result
---------------------
-Score: {result['score']}
-Grade: {result['grade']}
-
-🧠 Feedback:
-- """ + "\n- ".join(result["feedback"])
