@@ -2,12 +2,13 @@
 
 Welcome! This is a dynamic, state-preserving technical interview simulator built with Python and Streamlit. The application evaluates a candidate's conceptual understanding of programming topics in real-time, shifts questioning difficulty based on performance trends, extracts tech skills directly from uploaded PDF resumes, and exports a polished, presentation-ready PDF report of the session.
 
-I built this project to dive deep into **state machine design**, **data extraction pipelines**, and **real-time analytical dashboards**.
+I built this project to dive deep into **state machine design**, **data extraction pipelines**, **real-time analytical dashboards**, and **Semantic Natural Language Processing (NLP)**.
 
 ---
 
 ## 🚀 Key Architectural Highlights
 
+*   **Semantic NLP Evaluation Engine:** Replaced primitive keyword matching with an advanced, open-source Sentence Transformer (`all-MiniLM-L6-v2`) and Cosine Similarity mapping. The application computes high-dimensional vector embeddings to grade answers based on contextual, conceptual meaning rather than exact word spelling.
 *   **Atomic State Management:** Streamlit naturally executes code from top to bottom on every single button press, which normally wipes out active variables. I engineered a centralized memory engine inside `st.session_state` to prevent data erasure and keep the interview flowing flawlessly.
 *   **Dynamic Calibration Loops:** Designed an algorithmic turn processor that automatically scales question tracks (`easy` ⇄ `medium` ⇄ `hard`) depending on conceptual competency scores.
 *   **Tokenized Skill Extraction:** Built a pipeline that extracts text from raw PDF resumes using structured token patterns to automatically prioritize interview questions that align with the candidate's actual tech stack.
@@ -22,12 +23,12 @@ ai-interview-agent/
 │
 ├── app.py                # Core application dashboard and layout controller
 ├── orchestrator.py       # Turn processor, scoring routing, and flow engine
-├── evaluator.py          # Structural evaluation rules and algorithm modules
+├── evaluator.py          # Semantic NLP evaluation rules & mathematical embeddings
 ├── feedback.py           # Markdown styling and text analytics engine
 ├── questions.py          # Categorized, multi-tiered mock technical repository
 ├── state.py              # Central template schema for session initialization
 ├── resume_parser.py      # High-level PDF data extraction and skill filter
-├── report_generator.py   # Byte-level PDF matrix compiler
+├── report_generator.py   # Byte-level PDF matrix compiler using dynamic epw width
 ├── requirements.txt      # Python library dependencies
 └── .gitignore            # Version control exceptions file
 ```
