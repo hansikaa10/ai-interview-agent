@@ -30,10 +30,17 @@ answer = st.text_area("Your Answer:")
 
 if st.button("Submit Answer"):
 
-    result, topic, difficulty = run_interview(answer)
+    output = run_interview(answer)
+
+    result = output["result"]
+    topic = output["question"]
+    difficulty = output["difficulty"]
+    followup = output["followup"]
 
     st.write("### 📊 Score:", result["score"])
     st.write("### 🧠 Grade:", result["grade"])
+    if followup:
+        st.write("### 🔁 Follow-up:", followup)
 
     st.write("### 💬 Feedback:")
     for f in result["feedback"]:
