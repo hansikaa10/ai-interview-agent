@@ -1,84 +1,58 @@
 import re
 
-CONCEPTS = {
-    "functions": [
-        "reuse", "reusable", "call", "return", "parameter",
-        "argument", "task", "specific"
-    ],
-    "loops": [
-        "iterate", "repeat", "for", "while", "multiple", "times"
-    ],
-    "oop": [
-        "class", "object", "instance", "state",
-        "behavior", "attribute", "method", "encapsulation"
-    ],
-    "basics": [
-        "variable", "data", "value", "store", "type"
-    ]
+def normalize(text):
+    return re.sub(r"\s+", " ", text.lower().strip())
+
+
+KEY_CONCEPTS = {
+    "basics": {
+        "object": ["instance", "class", "object", "blueprint"],
+        "variable": ["store", "value", "memory", "data"],
+        "function": ["reuse", "block", "code", "task", "return"]
+    },
+    "oop": {
+        "object": ["instance", "class", "object"],
+        "class": ["blueprint", "object", "template"],
+        "inheritance": ["parent", "child", "reuse", "extend"],
+        "polymorphism": ["many", "forms", "override", "same name"]
+    }
 }
 
 
 def evaluate_answer(question, answer):
 
-    answer = answer.lower().strip()
+    q = normalize(question)
+    a = normalize(answer)
 
     score = 0
     feedback = []
 
-    # -----------------------
-    # LENGTH CHECK
-    # -----------------------
-    words = len(answer.split())
+    # find topic category
+    topic_keywords = KEY_CONCEPTS["oop"] if "object" in q or "class" in q else KEY_CONCEPTS["basics"]
 
-    if words < 5:
-        score -= 1
-        feedback.append("Answer is too short.")
-    elif words > 15:
-        score += 1
-        feedback.append("Good explanation length.")
-
-    # -----------------------
-    # DETECT TOPIC
-    # -----------------------
-    topic = "basics"
-    q = question.lower()
-
-    for t in CONCEPTS:
-        if t in q:
-            topic = t
-            break
-
-    # -----------------------
-    # CONCEPT MATCHING (FAIR SCORING)
-    # -----------------------
     matched = 0
-    for concept in CONCEPTS[topic]:
-        if concept in answer:
+    total = len(topic_keywords)
+
+    for concept, keywords in topic_keywords.items():
+
+        if any(k in a for k in keywords):
             matched += 1
 
-    # normalize score (IMPORTANT FIX)
-    concept_score = (matched / len(CONCEPTS[topic])) * 5
-    score += concept_score
+    score = (matched / total) * 5
 
-    feedback.append(
-        f"Matched {matched}/{len(CONCEPTS[topic])} key concepts for {topic}."
-    )
-
-    # -----------------------
-    # FINAL GRADING
-    # -----------------------
-    if score >= 4.5:
-        grade = "Excellent"
-    elif score >= 3:
-        grade = "Good"
-    elif score >= 1.5:
+    # feedback logic
+    if score >= 4:
+        grade = "Strong"
+        feedback.append("Good conceptual understanding.")
+    elif score >= 2:
         grade = "Average"
+        feedback.append(f"Partially correct. Matched {matched}/{total} concepts.")
     else:
         grade = "Weak"
+        feedback.append(f"Needs improvement. Matched {matched}/{total} concepts.")
 
     return {
         "score": round(score, 2),
         "grade": grade,
-        "feedback": feedback,
-        "matched_topic": topic
+        "feedback": feedback
     }
