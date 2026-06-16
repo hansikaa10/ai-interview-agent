@@ -15,9 +15,10 @@ def pick_topic():
 
 def update_memory(topic, result):
     state["score_history"].append(result["score"])
+
     state["history"].append({
-        "topic": topic,
         "question": state["current_question"],
+        "topic": topic,
         "score": result["score"],
         "grade": result["grade"]
     })
@@ -39,26 +40,21 @@ def update_difficulty(score):
 
 def generate_followup(topic, result):
     if result["score"] <= 1:
-        return f"Can you explain {topic} more simply?"
+        return f"Explain {topic} more simply"
     if result["score"] >= 5:
-        return f"Give a real-world example of {topic}."
+        return f"Give real example of {topic}"
     return None
 
 
-# =========================
-# SINGLE RESPONSIBILITY ENGINE
-# =========================
 def run_interview(answer=None):
 
-    # -------------------------
-    # MODE 1: ASK QUESTION
-    # -------------------------
+    # ---------------- ASK MODE ----------------
     if answer is None:
 
-        # follow-up has priority
         if state["pending_followup"]:
             q = state["pending_followup"]
             state["current_question"] = q
+            state["current_topic"] = "followup"
             state["pending_followup"] = None
 
             return {
@@ -70,26 +66,23 @@ def run_interview(answer=None):
             }
 
         topic = pick_topic()
-        question = get_question(topic, state["difficulty"])
+        q = get_question(topic, state["difficulty"])
 
-        state["current_question"] = question
+        state["current_question"] = q
         state["current_topic"] = topic
 
         return {
-            "question": question,
+            "question": q,
             "topic": topic,
             "result": None,
             "followup": None,
             "difficulty": state["difficulty"]
         }
 
-    # -------------------------
-    # MODE 2: EVALUATE ANSWER
-    # -------------------------
-    question = state["current_question"]
-    topic = state["current_topic"]
+    # ---------------- EVAL MODE ----------------
+    result = evaluate_answer(state["current_question"], answer)
 
-    result = evaluate_answer(question, answer)
+    topic = state["current_topic"]
 
     update_memory(topic, result)
     update_difficulty(result["score"])
@@ -97,8 +90,16 @@ def run_interview(answer=None):
     followup = generate_followup(topic, result)
     state["pending_followup"] = followup
 
+    # ALWAYS GENERATE NEXT QUESTION HERE
+    if followup:
+        next_q = followup
+    else:
+        next_q = get_question(topic, state["difficulty"])
+
+    state["current_question"] = next_q
+
     return {
-        "question": question,
+        "question": next_q,
         "topic": topic,
         "result": result,
         "followup": followup,

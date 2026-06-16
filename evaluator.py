@@ -18,41 +18,40 @@ KEY_CONCEPTS = {
     }
 }
 
-
 def evaluate_answer(question, answer):
 
-    q = normalize(question)
-    a = normalize(answer)
+    if not answer:
+        return {
+            "score": 0,
+            "grade": "Weak",
+            "feedback": ["No answer provided"],
+            "matched_topic": "unknown"
+        }
 
-    score = 0
-    feedback = []
+    keywords = question.lower().split()
 
-    # find topic category
-    topic_keywords = KEY_CONCEPTS["oop"] if "object" in q or "class" in q else KEY_CONCEPTS["basics"]
+    match_count = sum(1 for k in keywords if k in answer.lower())
 
-    matched = 0
-    total = len(topic_keywords)
+    score = min(5, max(0, match_count))
 
-    for concept, keywords in topic_keywords.items():
-
-        if any(k in a for k in keywords):
-            matched += 1
-
-    score = (matched / total) * 5
-
-    # feedback logic
     if score >= 4:
         grade = "Strong"
-        feedback.append("Good conceptual understanding.")
     elif score >= 2:
         grade = "Average"
-        feedback.append(f"Partially correct. Matched {matched}/{total} concepts.")
     else:
         grade = "Weak"
-        feedback.append(f"Needs improvement. Matched {matched}/{total} concepts.")
+
+    feedback = []
+    if score < 2:
+        feedback.append("Answer is too vague")
+    elif score < 4:
+        feedback.append("Good but missing depth")
+    else:
+        feedback.append("Excellent explanation")
 
     return {
-        "score": round(score, 2),
+        "score": score,
         "grade": grade,
-        "feedback": feedback
+        "feedback": feedback,
+        "matched_topic": "general"
     }
