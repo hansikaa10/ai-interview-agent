@@ -2,3 +2,5 @@
 streamlit
 pdfminer.six
 fpdf2
+sentence-transformers
+scikit-learn
