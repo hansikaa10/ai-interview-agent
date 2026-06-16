@@ -44,10 +44,15 @@ answer = st.text_area("Your Answer:")
 # -----------------------------
 if st.button("Submit Answer"):
 
+    # ❗ ONLY ONE CALL
     output = run_interview(answer)
 
     result = output["result"]
     followup = output["followup"]
+
+    # store latest question properly
+    st.session_state.question = output["question"]
+    st.session_state.topic = output["topic"]
 
     st.write("### 📊 Score:", result["score"])
     st.write("### 🧠 Grade:", result["grade"])
@@ -57,13 +62,11 @@ if st.button("Submit Answer"):
         for f in result["feedback"]:
             st.write("- ", f)
 
-    
     if followup:
-        st.session_state.question = followup
-        st.session_state.topic = "followup"
+        st.write("### 🔁 Follow-up Question")
+        st.write(followup)
     else:
     
-        next_q = run_interview()
         st.session_state.question = next_q["question"]
         st.session_state.topic = next_q["topic"]
 
