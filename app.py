@@ -7,11 +7,11 @@ from resume_parser import extract_resume_skills
 
 st.set_page_config(page_title="AI Interview Agent", layout="centered")
 
-st.title("🧠 AI Adaptive Interview Agent")
+st.title("🧠 AI Interview Agent")
 
-# -----------------------------
+# -----------------------
 # RESUME UPLOAD
-# -----------------------------
+# -----------------------
 st.sidebar.header("Resume Upload")
 
 file = st.sidebar.file_uploader("Upload PDF Resume", type=["pdf"])
@@ -23,53 +23,53 @@ if file:
         state["resume_skills"] = skills
         st.sidebar.success(f"Skills detected: {skills}")
 
-# -----------------------------
-# INIT FIRST QUESTION
-# -----------------------------
-if "question" not in st.session_state:
+# -----------------------
+# INIT QUESTION ONCE
+# -----------------------
+if state["current_question"] is None:
     output = run_interview()
-    st.session_state.question = output["question"]
+    state["current_question"] = output["question"]
 
-# -----------------------------
-# SHOW QUESTION
-# -----------------------------
-st.write("### 🧠 Question:")
-st.write(st.session_state.question)
+# -----------------------
+# DISPLAY QUESTION
+# -----------------------
+st.write("### 🧠 Question")
+st.write(state["current_question"])
 
-answer = st.text_area("Your Answer:")
+answer = st.text_area("Your Answer")
 
-# -----------------------------
+# -----------------------
 # SUBMIT
-# -----------------------------
+# -----------------------
 if st.button("Submit Answer"):
 
     if not answer.strip():
-        st.warning("Please write an answer")
+        st.warning("Write an answer first")
         st.stop()
 
     output = run_interview(answer)
 
     result = output["result"]
 
-    st.write("### 📊 Score:", result["score"])
-    st.write("### 🧠 Grade:", result["grade"])
+    st.write("### Score:", result["score"])
+    st.write("### Grade:", result["grade"])
 
     if result.get("feedback"):
-        st.write("### 💡 Feedback")
+        st.write("### Feedback")
         for f in result["feedback"]:
-            st.write("- ", f)
+            st.write("-", f)
 
-    # ALWAYS sync question from state (single source of truth)
-    st.session_state.question = state["current_question"]
+    # 🔥 CRITICAL FIX
+    # ALWAYS sync from backend state
+    state["current_question"] = run_interview().get("question", state["current_question"])
 
-# -----------------------------
+    st.rerun()
+
+# -----------------------
 # SIDEBAR
-# -----------------------------
-st.sidebar.write("### Weak Topics")
+# -----------------------
+st.sidebar.write("Weak Topics")
 st.sidebar.write(state["weak_topics"])
 
-st.sidebar.write("### Strong Topics")
+st.sidebar.write("Strong Topics")
 st.sidebar.write(state["strong_topics"])
-
-st.sidebar.write("### Resume Skills")
-st.sidebar.write(state["resume_skills"])

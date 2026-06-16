@@ -17,20 +17,11 @@ state = {
 
     "difficulty": "easy",
 
-    # CORE INTERVIEW STATE (IMPORTANT)
     "current_question": None,
     "current_topic": None,
 
-    # tracking
-    "history": [],
-    "score_history": [],
+    "pending_followup": None,
 
-    "skill_boost": {
-        "python": "basics",
-        "oop": "oop",
-        "functions": "functions",
-        "loops": "loops",
-        "machine learning": "basics",
-        "data science": "basics"
-    }
+    "history": [],
+    "score_history": []
 }
