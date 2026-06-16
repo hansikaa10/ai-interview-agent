@@ -1,53 +1,35 @@
-import re
-
-def normalize(text):
-    return re.sub(r"\s+", " ", text.lower().strip())
-
-
-KEY_CONCEPTS = {
-    "basics": {
-        "object": ["instance", "class", "object", "blueprint"],
-        "variable": ["store", "value", "memory", "data"],
-        "function": ["reuse", "block", "code", "task", "return"]
-    },
-    "oop": {
-        "object": ["instance", "class", "object"],
-        "class": ["blueprint", "object", "template"],
-        "inheritance": ["parent", "child", "reuse", "extend"],
-        "polymorphism": ["many", "forms", "override", "same name"]
-    }
-}
-
 def evaluate_answer(question, answer):
 
-    if not answer:
+    if not answer or len(answer.strip()) < 5:
         return {
             "score": 0,
             "grade": "Weak",
-            "feedback": ["No answer provided"],
+            "feedback": ["Answer too short or empty"],
             "matched_topic": "unknown"
         }
 
-    keywords = question.lower().split()
+    question_words = set(question.lower().split())
+    answer_words = set(answer.lower().split())
 
-    match_count = sum(1 for k in keywords if k in answer.lower())
+    overlap = len(question_words.intersection(answer_words))
 
-    score = min(5, max(0, match_count))
-
-    if score >= 4:
+    # SAFE SCORING (0–5)
+    if overlap >= 5:
+        score = 5
         grade = "Strong"
-    elif score >= 2:
+        feedback = ["Excellent explanation"]
+    elif overlap >= 3:
+        score = 3
         grade = "Average"
-    else:
+        feedback = ["Good but missing depth"]
+    elif overlap >= 1:
+        score = 1
         grade = "Weak"
-
-    feedback = []
-    if score < 2:
-        feedback.append("Answer is too vague")
-    elif score < 4:
-        feedback.append("Good but missing depth")
+        feedback = ["Too vague"]
     else:
-        feedback.append("Excellent explanation")
+        score = 0
+        grade = "Weak"
+        feedback = ["No relevant concepts found"]
 
     return {
         "score": score,

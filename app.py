@@ -1,16 +1,33 @@
 import streamlit as st
+import tempfile
 from orchestrator import run_interview
 from state import state
-st.write("🔥 NEW CODE VERSION LOADED")
+from resume_parser import extract_resume_skills
 
-st.set_page_config(page_title="AI Interview Agent")
+st.set_page_config(page_title="AI Interview Agent", layout="centered")
 
 st.title("AI Interview Agent")
 
+# ---------------- RESUME ----------------
+if "resume_loaded" not in st.session_state:
+    st.session_state.resume_loaded = False
+
+file = st.sidebar.file_uploader("Upload Resume", type=["pdf"])
+
+if file and not st.session_state.resume_loaded:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(file.read())
+        skills = extract_resume_skills(tmp.name)
+
+        state["resume_skills"] = skills
+        st.session_state.resume_loaded = True
+
+        st.sidebar.write("Skills:", skills)
+
 # ---------------- INIT ----------------
 if state["current_question"] is None:
-    q = run_interview()
-    state["current_question"] = q["question"]
+    first = run_interview()
+    state["current_question"] = first["question"]
 
 # ---------------- DISPLAY ----------------
 st.write("### Question")
@@ -22,27 +39,24 @@ answer = st.text_area("Your Answer")
 if st.button("Submit Answer"):
 
     if not answer.strip():
-        st.warning("Please write an answer")
+        st.warning("Write something first")
         st.stop()
 
     output = run_interview(answer)
-
     result = output["result"]
 
     st.write("### Score:", result["score"])
     st.write("### Grade:", result["grade"])
 
-    st.write("### Feedback")
     for f in result["feedback"]:
         st.write("-", f)
 
-    # UPDATE UI
     st.session_state.question = state["current_question"]
 
     st.rerun()
 
 # ---------------- REPORT ----------------
-st.sidebar.write("## Generate Report")
+st.sidebar.write("## Report")
 
 if st.sidebar.button("Generate Report"):
 

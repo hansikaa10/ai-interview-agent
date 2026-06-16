@@ -14,6 +14,7 @@ def pick_topic():
 
 
 def update_memory(topic, result):
+
     state["score_history"].append(result["score"])
 
     state["history"].append({
@@ -40,9 +41,9 @@ def update_difficulty(score):
 
 def generate_followup(topic, result):
     if result["score"] <= 1:
-        return f"Explain {topic} more simply"
+        return f"Explain {topic} simply"
     if result["score"] >= 5:
-        return f"Give real example of {topic}"
+        return f"Give real-world example of {topic}"
     return None
 
 
@@ -51,28 +52,14 @@ def run_interview(answer=None):
     # ---------------- ASK MODE ----------------
     if answer is None:
 
-        if state["pending_followup"]:
-            q = state["pending_followup"]
-            state["current_question"] = q
-            state["current_topic"] = "followup"
-            state["pending_followup"] = None
-
-            return {
-                "question": q,
-                "topic": "followup",
-                "result": None,
-                "followup": None,
-                "difficulty": state["difficulty"]
-            }
-
         topic = pick_topic()
-        q = get_question(topic, state["difficulty"])
+        question = get_question(topic, state["difficulty"])
 
-        state["current_question"] = q
+        state["current_question"] = question
         state["current_topic"] = topic
 
         return {
-            "question": q,
+            "question": question,
             "topic": topic,
             "result": None,
             "followup": None,
@@ -88,18 +75,17 @@ def run_interview(answer=None):
     update_difficulty(result["score"])
 
     followup = generate_followup(topic, result)
-    state["pending_followup"] = followup
 
-    # ALWAYS GENERATE NEXT QUESTION HERE
     if followup:
         next_q = followup
     else:
         next_q = get_question(topic, state["difficulty"])
 
+    state["pending_followup"] = followup
     state["current_question"] = next_q
 
     return {
-        "question": next_q,
+        "question": state["current_question"],
         "topic": topic,
         "result": result,
         "followup": followup,
