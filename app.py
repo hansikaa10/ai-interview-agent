@@ -31,6 +31,7 @@ answer = st.text_area("Your Answer:")
 if st.button("Submit Answer"):
 
     output = run_interview(answer)
+    st.write("DEBUG OUTPUT:", output)
 
     result = output["result"]
     difficulty = output["difficulty"]
