@@ -61,7 +61,7 @@ This project is an AI-powered interview simulator that adapts questions based on
 - questions.py → Question bank  
 - state.py → Memory tracking system  
 - resume_parser.py → Resume skill extraction  
-- feedback.py → Feedback formatting helper   
+- feedback.py → Giving feedback
 
 ---
 
