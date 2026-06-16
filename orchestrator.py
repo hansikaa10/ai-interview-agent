@@ -6,18 +6,26 @@ from evaluator import evaluate_answer
 LEVELS = ["easy", "medium", "hard"]
 
 def pick_topic(state):
-    # If resume skills exist, prioritize those topics first
-    if state.get("resume_skills"):
-        for skill in state["resume_skills"]:
-            if skill in state["weak_topics"]:
-                return skill
-                
-    # Sort topics by highest error weight/count
-    weak = sorted(state["weak_topics"].items(), key=lambda x: x[1], reverse=True)
-    if weak and weak[0][1] > 0:
-        return weak[0][0]
+    # 1. Gather all active topic categories
+    all_topics = list(state["weak_topics"].keys())
+    
+    # 2. Check what areas the candidate is struggling with the most
+    max_weak_value = max(state["weak_topics"].values())
+    
+    # If there are actual weak points flagged (> 0), pick randomly among the weakest areas
+    if max_weak_value > 0:
+        candidates = [topic for topic, count in state["weak_topics"].items() if count == max_weak_value]
+        return random.choice(candidates)
         
-    return random.choice(list(state["weak_topics"].keys()))
+    # 3. If there are no mistakes yet, prioritize resume skills but shuffle them to ensure variety
+    if state.get("resume_skills"):
+        valid_skills = [skill for skill in state["resume_skills"] if skill in state["weak_topics"]]
+        if valid_skills:
+            return random.choice(valid_skills) # Shuffles choices instead of locking the first one
+            
+    # 4. Ultimate fallback: pick any category randomly
+    return random.choice(all_topics)
+
 
 
 def update_memory(state, topic, result):
