@@ -6,21 +6,22 @@ from state import get_initial_state
 from orchestrator import run_interview_turn, pick_topic
 from questions import get_question
 from resume_parser import extract_resume_skills
-from feedback import generate_feedback
 from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
+
+# --- 1. MODERN MINIMALIST DARK THEME LAYOUT (CSS) ---
 st.markdown("""
     <style>
-    /* 1. Universal Dark Theme Foundation */
+    /* Global Background and Modern Typography */
     .stApp {
         background-color: #0f172a !important;
         color: #f1f5f9 !important;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* 2. Title & Secondary Caption Header Typography */
-    h1, h2, h3, h5, label {
+    /* Clean Title & Header Typography Overrides */
+    h1, h2, h3, h5, label, p, span {
         color: #ffffff !important;
         font-weight: 700 !important;
         letter-spacing: -0.025em;
@@ -29,7 +30,7 @@ st.markdown("""
         color: #94a3b8 !important;
     }
     
-    /* 3. Sleek Premium Card Container for Question Prompt */
+    /* Premium Container for Question Prompt Card */
     div[data-testid="stInfo"] {
         background-color: #1e293b !important;
         border: 1px solid #334155 !important;
@@ -42,7 +43,7 @@ st.markdown("""
         color: #e2e8f0 !important;
     }
     
-    /* 4. Text Input Block Overrides */
+    /* Text Input Interface Styling Overrides */
     textarea {
         background-color: #1e293b !important;
         border: 1px solid #334155 !important;
@@ -55,18 +56,13 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
     }
     
-    /* 5. Flat Minimalist Sidebar Background */
+    /* Flat Unified Sidebar Background Canvas */
     section[data-testid="stSidebar"] {
         background-color: #0b0f19 !important;
         border-right: 1px solid #1e293b !important;
     }
-    section[data-testid="stSidebar"] h1, 
-    section[data-testid="stSidebar"] h3, 
-    section[data-testid="stSidebar"] label {
-        color: #ffffff !important;
-    }
     
-    /* 6. Crimson/Coral Primary Submit Button */
+    /* Crimson Button Design Layout Override */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
         color: #ffffff !important;
@@ -82,7 +78,7 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
     }
     
-    /* 7. Clean Success Notification Styling */
+    /* Success Metrics Alert Strip Styling */
     div[data-testid="stSuccess"] {
         background-color: #064e3b !important;
         border: 1px solid #065f46 !important;
@@ -92,139 +88,107 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 1. Secure State Engine Hook
+# --- 2. STATE PIPELINE SYSTEM INITIALIZATION ---
 if "interview_state" not in st.session_state:
     st.session_state.interview_state = get_initial_state()
 
 state = st.session_state.interview_state
 
-# Initial question boot routine
+# Initial application setup hook
 if state["current_question"] is None:
     first_topic = pick_topic(state)
     state["current_topic"] = first_topic
     state["current_question"] = get_question(first_topic, state["difficulty"])
 
-# 2. Sidebar Componentry
-# Locate your sidebar section in app.py and update it to this:
+# --- 3. RE-DESIGNED LIVE ANALYTICS SIDEBAR ---
+st.sidebar.title("📊 Assessment Metrics")
 
-# 2. Sidebar Componentry
-st.sidebar.title("🧠 Assessment Metrics")
-
-# Resume Skill Processor (Keep your existing upload code intact)
-uploaded_file = st.sidebar.file_uploader("Upload PDF Resume", type=["pdf"])
+# Panel A: Resume Parsing Pipeline Interface
+st.sidebar.markdown("##### **Upload PDF Resume**")
+uploaded_file = st.sidebar.file_uploader("Upload Profile PDF", type=["pdf"], label_visibility="collapsed")
 if uploaded_file and not state["resume_loaded"]:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(uploaded_file.read())
         skills = extract_resume_skills(tmp.name)
         state["resume_skills"] = skills
         state["resume_loaded"] = True
-        st.sidebar.success(f"Loaded Skills: {', '.join(skills)}")
+        st.sidebar.success(f"🎯 Loaded Skills: {', '.join(skills)}")
 
+# Panel B: Live Level Difficulty Banners
 st.sidebar.markdown("---")
-st.sidebar.subheader("🎯 Live Calibration Metrics")
+st.sidebar.markdown("##### **Live Calibration Metrics**")
+diff_badge = {"easy": "🟢 Easy Track", "medium": "🟡 Medium Track", "hard": "🔴 Hard Track"}
+st.sidebar.markdown(f"Current Difficulty Level: **{diff_badge.get(state['difficulty'], state['difficulty'].upper())}**")
 
-# Visual Element 1: Clean Level Indicator Gauge
-difficulty_colors = {"easy": "🟢 Easy Track", "medium": "🟡 Medium Track", "hard": "🔴 Hard Track"}
-current_lev = state.get('difficulty', 'easy')
-st.sidebar.markdown(f"Current Difficulty Level: **{difficulty_colors.get(current_lev, current_lev.upper())}**")
-
-# Visual Element 2: Real-time Interactive Strength vs. Weakness Chart
+# Panel C: Responsive Progress Meter Loops (Replaces old raw JSON text)
+st.sidebar.markdown("---")
 st.sidebar.markdown("##### **Topic Competency Matrix**")
-
-# Prepare data payload safely for the UI rendering framework
-chart_data = {}
-all_topics = set(list(state["strong_topics"].keys()) + list(state["weak_topics"].keys()))
-
+all_topics = list(state["weak_topics"].keys())
 for topic in all_topics:
     strong_count = state["strong_topics"].get(topic, 0)
     weak_count = state["weak_topics"].get(topic, 0)
-    # Calculate a net baseline proficiency metric index score
-    total_attempts = strong_count + weak_count
-    if total_attempts > 0:
-        chart_data[topic.upper()] = round((strong_count / total_attempts) * 100, 1)
-    else:
-        chart_data[topic.upper()] = 0.0
+    total = strong_count + weak_count
+    
+    score_ratio = (strong_count / total) if total > 0 else 0.0
+    
+    st.sidebar.markdown(f"`{topic.upper()}`")
+    st.sidebar.progress(score_ratio)
 
-# Render native graphical container instantly down the sidebar channel
-if any(v > 0 for v in chart_data.values()):
-    st.sidebar.bar_chart(chart_data)
-else:
-    st.sidebar.caption("Complete your first interview question to populate the analytics dashboard chart grid matrix.")
-
-# Visual Element 3: Clean Metric Progress Cards
+# Panel D: Dynamic Metric Timeline Indicators
+st.sidebar.markdown("---")
 st.sidebar.markdown("##### **Recent Score Trajectory Trend**")
 if state.get("score_history"):
-    recent_scores = state["score_history"][-3:] # Capture the last 3 turns
+    recent_scores = state["score_history"][-3:]
     cols = st.sidebar.columns(len(recent_scores))
     for idx, scr in enumerate(recent_scores):
-        cols[idx].metric(label=f"Round {len(state['score_history'])-len(recent_scores)+idx+1}", value=f"{scr}/5")
+        cols[idx].metric(label=f"Rd {len(state['score_history'])-len(recent_scores)+idx+1}", value=f"{scr}/5")
 else:
     st.sidebar.caption("No historical run timelines recorded yet.")
 
-
-# Metrics Dashboard
-st.sidebar.markdown("---")
-st.sidebar.subheader("🎯 Live Calibration Metrics")
-st.sidebar.info(f"Target Track Level: **{state['difficulty'].upper()}**")
-
-st.sidebar.markdown("**Demonstrated Proficiencies**")
-st.sidebar.json(state["strong_topics"])
-
-st.sidebar.markdown("**Flagged Areas for Improvement**")
-st.sidebar.json(state["weak_topics"])
-
-# 3. Main Workspace Routine
+# --- 4. EXECUTIVE WORKSPACE VIEWPORT ---
 st.title("🤖 Adaptive Tech Interview Platform")
-st.caption("Dynamic problem sets scaling with runtime user input analytics.")
+st.caption("⚡ Powered by Vector Semantic NLP (all-MiniLM-L6-v2) Evaluation Models.")
+st.markdown("---")
 
-st.subheader("Current Interview Question:")
-st.info(state["current_question"])
-
-# Clean text input area using unique session identification keys
-user_answer = st.text_area("Your Answer:", key="input_text_area", height=150)
-
-if st.button("Submit Answer", type="primary"):
-    if not user_answer.strip():
-        st.warning("Text entry block cannot be submitted empty.")
-    else:
-        with st.spinner("Analyzing semantics via AI Evaluation Matrix..."):
-            # Execute state machine cycle updates
-            eval_output = run_interview_turn(state, user_answer)
-            
-            # Extract historical references for printing logs
-            latest_topic = state["current_topic"]
-            
-            # Format and display real-time feedback
-            feedback_md = generate_feedback(
-                eval_output, 
-                state["current_question"], 
-                user_answer, 
-                latest_topic
-            )
-            st.session_state["last_feedback"] = feedback_md
-            st.rerun()
-
-# Keep feedback visible across session refreshes
-if "last_feedback" in st.session_state:
-    st.markdown("---")
-    st.markdown(st.session_state["last_feedback"])
-
-# 4. Final Transcript Report Generator Engine
-
-if len(state["history"]) > 0:
-    st.markdown("---")
-    st.subheader("🏁 Conclude & Export Interview")
+main_container = st.container()
+with main_container:
+    st.markdown("##### Current Interview Question Prompt:")
+    st.info(state["current_question"])
+    st.write("") 
     
+    user_answer = st.text_area("Your Answer:", height=150, placeholder="Type your answer layout solution guidelines here...")
+    st.write("") 
+    
+    if st.button("Submit Answer", type="primary"):
+        if not user_answer.strip():
+            st.warning("The solution entry field cannot be submitted blank.")
+        else:
+            with st.spinner("Analyzing semantic coordinate vectors..."):
+                eval_output = run_interview_turn(state, user_answer)
+                st.rerun()
+
+# --- 5. CHRONOLOGICAL EVALUATION METRICS REPORT ENGINE ---
+if state["history"]:
+    latest_run = state["history"][-1]
+    st.markdown("---")
+    st.subheader("🏁 Performance Review & Report Panel")
+    
+    # Real-Time Visual Feedback Output Cards
+    col_g1, col_g2 = st.columns(2)
+    col_g1.metric(label="Assigned Performance Rating", value=latest_run["grade"])
+    col_g2.metric(label="Calculated Evaluation Score", value=f"{latest_run['score']} / 5")
+    
+    st.write("")
+    
+    # PDF Compilation Stream Processing Trigger
     try:
-        # Generate the PDF binary array snapshot string data stream 
         pdf_data = generate_pdf_transcript(state)
-        
         st.success("PDF Transcript successfully compiled and calibrated!")
         st.download_button(
             label="📥 Download PDF Assessment Report",
-            data=bytes(pdf_data), # Convert string output buffer safely into browser byte format
+            data=bytes(pdf_data),
             file_name="interview_performance_report.pdf",
             mime="application/pdf"
         )
     except Exception as e:
-        st.error(f"Failed to generate document matrix layout: {str(e)}")
+        st.error(f"Failed to generate layout matrix report tracking streams: {str(e)}")
