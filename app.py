@@ -12,7 +12,7 @@ st.set_page_config(page_title="AI Interview Agent", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. Clean Premium Deep Slate Foundation */
+    /* 1. Premium Minimalist Dark Slate Foundation Base */
     .stApp {
         background-color: #090d16 !important;
         color: #f8fafc !important;
@@ -66,7 +66,7 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
     }
     
-    /* 5. Flat Solid Charcoal Sidebar Navigation */
+    /* 5. Flat Solid Charcoal Sidebar Navigation Background */
     section[data-testid="stSidebar"] {
         background-color: #05070f !important;
         border-right: 1px solid #121824 !important;
@@ -88,8 +88,8 @@ st.markdown("""
         margin-top: 8px !important;
     }
     
-    /* 7. Flat Vivid Blue Submit Action Button */
-    div.stButton > button:first-child {
+    /* 7. Targeted Primary Action Button (Main Workspace Only) */
+    div[data-testid="stMain"] div.stButton > button:first-child {
         background-color: #2563eb !important;
         color: #ffffff !important;
         font-weight: 600 !important;
@@ -99,21 +99,34 @@ st.markdown("""
         transition: background-color 0.2s ease;
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     }
-    div.stButton > button:first-child:hover {
+    div[data-testid="stMain"] div.stButton > button:first-child:hover {
         background-color: #1d4ed8 !important;
     }
     
-    /* 8. Download Panel Button Layout Match */
+    /* 8. Download Panel Button Minimal Layout Match */
     div[data-testid="stVerticalBlock"] div.stButton > button:first-child {
         background-color: #1e293b !important;
         border: 1px solid #334155 !important;
         box-shadow: none !important;
+        padding: 0.5rem 1.5rem !important;
     }
     div[data-testid="stVerticalBlock"] div.stButton > button:first-child:hover {
         background-color: #334155 !important;
     }
     
-    /* 9. Subdued Forest Green Success Strips */
+    /* 9. Safety Guard: Protect File Uploader Styles from Button Conflicts */
+    div[data-testid="stFileUploader"] button {
+        background-color: #1e293b !important;
+        color: #ffffff !important;
+        border: 1px solid #334155 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    div[data-testid="stFileUploader"] button:hover {
+        background-color: #334155 !important;
+    }
+    
+    /* 10. Subdued Forest Green Success Notification Strips */
     div[data-testid="stSuccess"] {
         background-color: #022c22 !important;
         border: 1px solid #064e3b !important;
@@ -122,7 +135,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
 
 
 # --- 2. STATE PIPELINE SYSTEM INITIALIZATION ---
