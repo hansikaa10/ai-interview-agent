@@ -10,6 +10,87 @@ from feedback import generate_feedback
 from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
+st.markdown("""
+    <style>
+    /* 1. Universal Dark Theme Foundation */
+    .stApp {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* 2. Title & Secondary Caption Header Typography */
+    h1, h2, h3, h5, label {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.025em;
+    }
+    .stCaption {
+        color: #94a3b8 !important;
+    }
+    
+    /* 3. Sleek Premium Card Container for Question Prompt */
+    div[data-testid="stInfo"] {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-left: 6px solid #3b82f6 !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    div[data-testid="stInfo"] div {
+        color: #e2e8f0 !important;
+    }
+    
+    /* 4. Text Input Block Overrides */
+    textarea {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+        font-size: 1rem !important;
+    }
+    textarea:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    }
+    
+    /* 5. Flat Minimalist Sidebar Background */
+    section[data-testid="stSidebar"] {
+        background-color: #0b0f19 !important;
+        border-right: 1px solid #1e293b !important;
+    }
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h3, 
+    section[data-testid="stSidebar"] label {
+        color: #ffffff !important;
+    }
+    
+    /* 6. Crimson/Coral Primary Submit Button */
+    div.stButton > button:first-child {
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        border: none !important;
+        padding: 0.6rem 2.2rem !important;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+    }
+    div.stButton > button:first-child:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+    }
+    
+    /* 7. Clean Success Notification Styling */
+    div[data-testid="stSuccess"] {
+        background-color: #064e3b !important;
+        border: 1px solid #065f46 !important;
+        color: #34d399 !important;
+        border-radius: 10px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # 1. Secure State Engine Hook
 if "interview_state" not in st.session_state:
