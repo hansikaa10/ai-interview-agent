@@ -10,83 +10,128 @@ from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
 
-# --- 1. MODERN MINIMALIST DARK THEME LAYOUT (CSS) ---
 st.markdown("""
     <style>
-    /* Global Background and Modern Typography */
+    /* 1. Cyberpunk Dark Base with Digital Grid Texture */
     .stApp {
-        background-color: #0f172a !important;
-        color: #f1f5f9 !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #030712 !important;
+        color: #e2e8f0 !important;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+        background-image: 
+            linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
     }
     
-    /* Clean Title & Header Typography Overrides */
-    h1, h2, h3, h5, label, p, span {
+    /* 2. Glowing Neon Futuristic Titles */
+    h1 {
         color: #ffffff !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.025em;
+        font-weight: 800 !important;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.2);
+        letter-spacing: -1px;
+    }
+    h2, h3, h5, label {
+        color: #38bdf8 !important; /* Cyber Cyan Headers */
+        font-family: 'JetBrains Mono', monospace !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
     .stCaption {
-        color: #94a3b8 !important;
+        color: #a855f7 !important; /* Matrix Purple Subtext */
+        font-family: 'JetBrains Mono', monospace;
     }
     
-    /* Premium Container for Question Prompt Card */
+    /* 3. Glassmorphic Sci-Fi Prompt Container */
     div[data-testid="stInfo"] {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
-        border-left: 6px solid #3b82f6 !important;
-        border-radius: 12px !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(56, 189, 248, 0.2) !important;
+        border-left: 6px solid #06b6d4 !important; /* Electric Cyan accent */
+        border-radius: 10px !important;
         padding: 1.5rem !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
     }
     div[data-testid="stInfo"] div {
-        color: #e2e8f0 !important;
+        color: #38bdf8 !important;
     }
     
-    /* Text Input Interface Styling Overrides */
+    /* 4. Terminal-Style Text Entry Windows */
     textarea {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-        font-size: 1rem !important;
+        background-color: #020617 !important;
+        border: 1px solid #1e293b !important;
+        border-radius: 8px !important;
+        color: #4ade80 !important; /* Classic Matrix Terminal Green Output Text */
+        font-family: 'Fira Code', 'Courier New', monospace !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
     }
     textarea:focus {
-        border-color: #3b82f6 !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+        border-color: #a855f7 !important; /* Glows neon purple on selection focus */
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.3) !important;
     }
     
-    /* Flat Unified Sidebar Background Canvas */
+    /* 5. Deep Void Command Sidebar Panel */
     section[data-testid="stSidebar"] {
-        background-color: #0b0f19 !important;
-        border-right: 1px solid #1e293b !important;
+        background-color: #020617 !important;
+        border-right: 1px solid rgba(56, 189, 248, 0.1) !important;
     }
     
-    /* Crimson Button Design Layout Override */
+    /* 6. High-Visibility Custom Matrix Sidebar Progress Bars */
+    div[data-testid="stSidebar"] div[role="progressbar"] {
+        background-color: #1e293b !important;
+        border-radius: 4px;
+        height: 8px !important;
+    }
+    div[data-testid="stSidebar"] div[role="progressbar"] > div {
+        background: linear-gradient(90deg, #3b82f6, #06b6d4) !important; /* Cyber color gradient shift */
+        box-shadow: 0 0 8px #06b6d4;
+    }
+    div[data-testid="stSidebar"] p {
+        color: #e2e8f0 !important;
+        font-size: 0.8rem !important;
+        margin-top: 10px !important;
+    }
+    
+    /* 7. Pulse-Glowing Primary Action Button */
     div.stButton > button:first-child {
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
-        border-radius: 8px !important;
-        border: none !important;
+        font-family: 'JetBrains Mono', monospace !important;
+        text-transform: uppercase;
+        font-weight: 700 !important;
+        border-radius: 6px !important;
+        border: 1px solid #f87171 !important;
         padding: 0.6rem 2.2rem !important;
-        transition: all 0.2s ease-in-out;
-        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
     }
     div.stButton > button:first-child:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+        transform: scale(1.02) translateY(-1px);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        border-color: #ffffff !important;
     }
     
-    /* Success Metrics Alert Strip Styling */
+    /* 8. Download Panel Button Override Style */
+    div[data-testid="stVerticalBlock"] div.stButton > button:first-child {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+        border: 1px solid #60a5fa !important;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.3) !important;
+    }
+    div[data-testid="stVerticalBlock"] div.stButton > button:first-child:hover {
+        box-shadow: 0 0 20px rgba(37, 99, 235, 0.6) !important;
+    }
+    
+    /* 9. Holographic Green Success Confirmation Banners */
     div[data-testid="stSuccess"] {
-        background-color: #064e3b !important;
-        border: 1px solid #065f46 !important;
+        background-color: rgba(6, 78, 59, 0.4) !important;
+        backdrop-filter: blur(8px);
+        border: 1px solid #10b981 !important;
         color: #34d399 !important;
-        border-radius: 10px !important;
+        text-shadow: 0 0 5px rgba(52, 211, 153, 0.5);
+        border-radius: 8px !important;
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 # --- 2. STATE PIPELINE SYSTEM INITIALIZATION ---
 if "interview_state" not in st.session_state:
