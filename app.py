@@ -10,9 +10,10 @@ from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
 
+# app.py (Replace only the CSS markdown section near the top)
 st.markdown("""
     <style>
-    /* 1. Premium Minimalist Dark Slate Foundation Base */
+    /* 1. Clean Premium Deep Slate Foundation Base */
     .stApp {
         background-color: #090d16 !important;
         color: #f8fafc !important;
@@ -88,45 +89,34 @@ st.markdown("""
         margin-top: 8px !important;
     }
     
-    /* 7. Targeted Primary Action Button (Main Workspace Only) */
-    div[data-testid="stMain"] div.stButton > button:first-child {
+    /* 7. TARGETS ONLY THE MAIN SUBMIT BUTTON VIA KIND COMPONENT (Safe & Clean) */
+    button[kind="primary"] {
         background-color: #2563eb !important;
         color: #ffffff !important;
         font-weight: 600 !important;
         border-radius: 8px !important;
         border: none !important;
         padding: 0.6rem 2.2rem !important;
-        transition: background-color 0.2s ease;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        transition: background-color 0.2s ease !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
     }
-    div[data-testid="stMain"] div.stButton > button:first-child:hover {
+    button[kind="primary"]:hover {
         background-color: #1d4ed8 !important;
     }
     
-    /* 8. Download Panel Button Minimal Layout Match */
-    div[data-testid="stVerticalBlock"] div.stButton > button:first-child {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
-        box-shadow: none !important;
-        padding: 0.5rem 1.5rem !important;
-    }
-    div[data-testid="stVerticalBlock"] div.stButton > button:first-child:hover {
-        background-color: #334155 !important;
-    }
-    
-    /* 9. Safety Guard: Protect File Uploader Styles from Button Conflicts */
-    div[data-testid="stFileUploader"] button {
+    /* 8. TARGETS ONLY THE DOWNLOAD BUTTON IN THE ACTION AREA */
+    div[data-testid="stVerticalBlock"] button[kind="secondary"] {
         background-color: #1e293b !important;
         color: #ffffff !important;
         border: 1px solid #334155 !important;
-        box-shadow: none !important;
-        transform: none !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1.5rem !important;
     }
-    div[data-testid="stFileUploader"] button:hover {
+    div[data-testid="stVerticalBlock"] button[kind="secondary"]:hover {
         background-color: #334155 !important;
     }
     
-    /* 10. Subdued Forest Green Success Notification Strips */
+    /* 9. Subdued Forest Green Success Notification Strips */
     div[data-testid="stSuccess"] {
         background-color: #022c22 !important;
         border: 1px solid #064e3b !important;
