@@ -11,6 +11,67 @@ from report_generator import generate_pdf_transcript
 
 st.set_page_config(page_title="AI Interview Agent", layout="wide")
 
+# Inject Modern Tech Styling
+st.markdown("""
+    <style>
+    /* 1. Main Background and Custom Fonts */
+    .stApp {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+    
+    /* 2. Beautiful Soft Header Borders */
+    h1 {
+        color: #1e293b !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
+    }
+    
+    /* 3. Style the Question Box Container */
+    .stAlert {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-left: 5px solid #2563eb !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    
+    /* 4. Style the Submit Button to Look Premium */
+    div.stButton > button:first-child {
+        background-color: #2563eb !important;
+        color: white !important;
+        font-weight: 600 !important;
+        padding: 0.6rem 2rem !important;
+        border-radius: 8px !important;
+        border: none !important;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2);
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #1d4ed8 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px -1px rgba(37,99,235,0.3);
+    }
+    
+    /* 5. Clean Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
+    }
+    
+    /* 6. Style Input Text Area */
+    textarea {
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    textarea:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
 # 1. Secure State Engine Hook
 if "interview_state" not in st.session_state:
     st.session_state.interview_state = get_initial_state()
