@@ -2,134 +2,239 @@
 import random
 
 BANK = {
+
     "python": {
+
         "easy": [
-            "What is a variable in Python?",
-            "What is the difference between a list and a tuple?",
-            "What is a dictionary in Python?",
-            "What is the purpose of indentation in Python?",
-            "What is the difference between == and = ?"
+
+            {
+                "question": "What is a variable in Python?",
+                "answer": "A variable is a named location used to store data values in a program."
+            },
+
+            {
+                "question": "What is the difference between a list and a tuple?",
+                "answer": "Lists are mutable while tuples are immutable."
+            },
+
+            {
+                "question": "What is a dictionary in Python?",
+                "answer": "A dictionary stores data as key-value pairs."
+            }
+
         ],
+
         "medium": [
-            "Explain data types in Python and how mutability works.",
-            "What are list comprehensions and how do you use them?",
-            "Explain the difference between shallow copy and deep copy.",
-            "What is exception handling in Python?",
-            "What are Python modules and packages?"
+
+            {
+                "question": "Explain data types in Python and how mutability works.",
+                "answer": "Python has mutable and immutable data types. Mutable objects can be modified while immutable objects cannot."
+            },
+
+            {
+                "question": "What are list comprehensions?",
+                "answer": "List comprehensions provide a concise way to create lists using a single expression."
+            }
+
         ],
+
         "hard": [
-            "Explain Python memory management, including garbage collection.",
-            "What are decorators and how do you implement a custom one?",
-            "Explain generators and the yield keyword.",
-            "What are context managers and why are they useful?",
-            "Explain multithreading vs multiprocessing in Python."
+
+            {
+                "question": "Explain Python memory management.",
+                "answer": "Python manages memory automatically using reference counting and garbage collection."
+            },
+
+            {
+                "question": "What are decorators?",
+                "answer": "Decorators modify or extend the behavior of functions without changing their source code."
+            }
+
         ]
     },
 
     "oop": {
-        "easy": [
-            "What is a class and an object?",
-            "What is encapsulation?",
-            "What is the purpose of a constructor?",
-            "What is an instance variable?",
-            "How do you create an object in Python?"
-        ],
-        "medium": [
-            "What is inheritance and how do you use super()?",
-            "Explain the difference between abstract classes and interfaces.",
-            "What is method overriding?",
-            "Explain polymorphism with an example.",
-            "What is composition in OOP?"
-        ],
-        "hard": [
-            "Explain polymorphism and method overriding with a clean example.",
-            "What are dunder (magic) methods in Python OOP?",
-            "Explain multiple inheritance and the Method Resolution Order (MRO).",
-            "What is operator overloading?",
-            "Explain SOLID principles in object-oriented programming."
-        ]
-    },
 
-    "basics": {
         "easy": [
-            "What is an expression versus a statement?",
-            "What is a keyword in Python?",
-            "What are comments used for?",
-            "What is the difference between syntax errors and runtime errors?",
-            "What is the purpose of input()?"
+
+            {
+                "question": "What is a class?",
+                "answer": "A class is a blueprint used to create objects."
+            },
+
+            {
+                "question": "What is an object?",
+                "answer": "An object is an instance of a class containing data and methods."
+            },
+
+            {
+                "question": "What is encapsulation?",
+                "answer": "Encapsulation bundles data and methods together while restricting direct access."
+            }
+
         ],
+
         "medium": [
-            "How does exception handling work using try-except blocks?",
-            "Explain the difference between mutable and immutable objects.",
-            "What is variable scope in Python?",
-            "What are lambda functions?",
-            "Explain type casting."
+
+            {
+                "question": "What is inheritance?",
+                "answer": "Inheritance allows one class to inherit properties and methods from another class."
+            },
+
+            {
+                "question": "Explain polymorphism.",
+                "answer": "Polymorphism allows the same interface to behave differently for different objects."
+            }
+
         ],
+
         "hard": [
-            "Explain the Global Interpreter Lock (GIL) in Python.",
-            "What is monkey patching?",
-            "Explain Python's object model.",
-            "How does Python import modules internally?",
-            "Explain reference counting."
+
+            {
+                "question": "What are magic methods?",
+                "answer": "Magic methods are special Python methods beginning and ending with double underscores."
+            },
+
+            {
+                "question": "Explain method overriding.",
+                "answer": "Method overriding allows a child class to provide its own implementation of a parent method."
+            }
+
         ]
     },
 
     "loops": {
+
         "easy": [
-            "What is a for loop?",
-            "What is a while loop?",
-            "When would you use a loop?",
-            "How do you stop a loop?",
-            "What does the range() function do?"
+
+            {
+                "question": "What is a for loop?",
+                "answer": "A for loop repeats code for each item in an iterable."
+            },
+
+            {
+                "question": "What is a while loop?",
+                "answer": "A while loop repeats while a condition remains true."
+            }
+
         ],
+
         "medium": [
-            "What is the difference between a for loop and a while loop?",
-            "Explain break and continue with examples.",
-            "What is loop nesting?",
-            "How do you iterate through a dictionary?",
-            "How do enumerate() and zip() simplify loops?"
+
+            {
+                "question": "Difference between for and while loops?",
+                "answer": "A for loop is generally used when the number of iterations is known, while a while loop runs until a condition becomes false."
+            }
+
         ],
+
         "hard": [
-            "Explain nested loops and how to break out of them cleanly.",
-            "Discuss the time complexity of nested loops.",
-            "What are infinite loops and how can you avoid them?",
-            "How do generator expressions work in loops?",
-            "How would you optimize inefficient loops?"
+
+            {
+                "question": "Explain nested loops.",
+                "answer": "Nested loops are loops placed inside another loop and are useful for multidimensional iteration."
+            }
+
         ]
     },
 
     "functions": {
+
         "easy": [
-            "What is a function?",
-            "What is a function parameter?",
-            "What is a function argument?",
-            "Why do we use functions?",
-            "How do you call a function in Python?"
+
+            {
+                "question": "What is a function?",
+                "answer": "A function is a reusable block of code that performs a specific task."
+            },
+
+            {
+                "question": "Why do we use functions?",
+                "answer": "Functions improve code reuse, readability, and maintainability."
+            },
+
+            {
+                "question": "What is a function parameter?",
+                "answer": "A parameter is a variable defined in a function that receives input values."
+            }
+
         ],
+
         "medium": [
-            "What is the difference between return and print?",
-            "What are *args and **kwargs?",
-            "What are default arguments?",
-            "Explain keyword arguments.",
-            "Can a function return multiple values?"
+
+            {
+                "question": "Difference between return and print?",
+                "answer": "Return sends a value back to the caller while print only displays output."
+            },
+
+            {
+                "question": "What are *args and **kwargs?",
+                "answer": "They allow functions to accept a variable number of positional and keyword arguments."
+            }
+
         ],
+
         "hard": [
-            "Explain variable scope (LEGB rule) inside nested functions.",
-            "What are closures in Python?",
-            "Explain recursion with an example.",
-            "What are lambda functions?",
-            "How do decorators work with functions?"
+
+            {
+                "question": "Explain the LEGB rule.",
+                "answer": "LEGB stands for Local, Enclosing, Global and Built-in variable scope."
+            },
+
+            {
+                "question": "Explain recursion.",
+                "answer": "Recursion is when a function calls itself until a base condition is reached."
+            }
+
+        ]
+    },
+
+    "basics": {
+
+        "easy": [
+
+            {
+                "question": "What is an expression?",
+                "answer": "An expression is a piece of code that produces a value."
+            },
+
+            {
+                "question": "What is a statement?",
+                "answer": "A statement performs an action but does not necessarily produce a value."
+            }
+
+        ],
+
+        "medium": [
+
+            {
+                "question": "Explain exception handling.",
+                "answer": "Exception handling uses try and except blocks to catch and handle runtime errors."
+            }
+
+        ],
+
+        "hard": [
+
+            {
+                "question": "What is the Global Interpreter Lock?",
+                "answer": "The GIL allows only one thread to execute Python bytecode at a time."
+            }
+
         ]
     }
+
 }
 
 
 def get_question(topic, difficulty):
+
     if topic not in BANK:
         topic = "basics"
 
     if difficulty not in BANK[topic]:
         difficulty = "easy"
 
-    return random.choice(BANK[topic][difficulty])
+    q = random.choice(BANK[topic][difficulty])
+
+    return q["question"], q["answer"]
 
