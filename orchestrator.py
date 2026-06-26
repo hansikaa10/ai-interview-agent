@@ -69,30 +69,41 @@ def generate_followup(topic, result):
     return None
 
 def run_interview_turn(state, answer):
-    # Process the evaluation of the user's current answer
-    result = evaluate_answer(state["current_question"], answer)
+
+    # Evaluate using the reference answer
+    result = evaluate_answer(
+        state["current_question"],
+        answer,
+        state["reference_answer"]
+    )
+
     topic = state["current_topic"]
-    
+
     update_memory(state, topic, result)
     update_difficulty(state, result["score"])
-    
-    # 1. Check if the question just answered was ALREADY a follow-up
+
     was_already_followup = state.get("pending_followup") is not None
-    
-    # 2. Only generate a new follow-up if we aren't already inside one
+
     if not was_already_followup:
         followup = generate_followup(topic, result)
     else:
-        followup = None # Force transition to a new question
-        
+        followup = None
+
     state["pending_followup"] = followup
-    
-    # 3. Stage the next question
+
     if followup:
         state["current_question"] = followup
+        state["reference_answer"] = ""
     else:
         next_topic = pick_topic(state)
+
+        question, reference = get_question(
+            next_topic,
+            state["difficulty"]
+        )
+
         state["current_topic"] = next_topic
-        state["current_question"] = get_question(next_topic, state["difficulty"])
-        
+        state["current_question"] = question
+        state["reference_answer"] = reference
+
     return result

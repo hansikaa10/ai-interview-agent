@@ -18,9 +18,15 @@ state = st.session_state.interview_state
 
 if state["current_question"] is None:
     first_topic = pick_topic(state)
-    state["current_topic"] = first_topic
-    state["current_question"] = get_question(first_topic, state["difficulty"])
 
+    question, reference = get_question(
+        first_topic,
+        state["difficulty"]
+    )
+
+    state["current_topic"] = first_topic
+    state["current_question"] = question
+    state["reference_answer"] = reference
 # --- 2. NATIVE METRIC SIDEBAR ---
 st.sidebar.title("📊 Assessment Metrics")
 
